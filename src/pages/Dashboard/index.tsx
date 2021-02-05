@@ -22,7 +22,7 @@ interface Repository {
 
 const Dashboard: React.FC = () => {
   const search = (item: Repository) =>
-    item.full_name.toUpperCase() === newRepo.toUpperCase();
+    item.full_name.toUpperCase() === newRepo.toUpperCase().trim();
   const [newRepo, setNewRepo] = useState("");
   const [inputError, setInputError] = useState("");
   const [repositories, setRepositories] = useState<Repository[]>(() => {
@@ -70,7 +70,9 @@ const Dashboard: React.FC = () => {
     if (inputError) return;
 
     try {
-      const { data, status } = await api.get<Repository>(`repos/${newRepo}`);
+      const { data, status } = await api.get<Repository>(
+        `repos/${newRepo.trim()}`
+      );
 
       if (status === 200) {
         const repository = data;
