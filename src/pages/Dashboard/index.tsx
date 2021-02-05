@@ -56,6 +56,7 @@ const Dashboard: React.FC = () => {
     setExistRepo("");
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useMemo(() => handleVerify(), [newRepo]);
 
   async function handleAddRepository(event: FormEvent<HTMLFormElement>) {
