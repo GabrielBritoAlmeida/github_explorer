@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FormEvent } from "react";
+import React, { useState, useEffect, FormEvent, useMemo } from "react";
 import { FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
@@ -14,9 +14,14 @@ interface Repository {
     login: string;
     avatar_url: string;
   };
+  item: {
+    full_name: string;
+  };
 }
 
 const Dashboard: React.FC = () => {
+  const search = (item: Repository) =>
+    item.full_name.toUpperCase() === newRepo.toUpperCase();
   const [newRepo, setNewRepo] = useState("");
   const [inputError, setInputError] = useState("");
   const [existRepo, setExistRepo] = useState("");
@@ -41,6 +46,18 @@ const Dashboard: React.FC = () => {
     );
   }, [repositories]);
 
+  function handleVerify(): void {
+    const verify = repositories.find(search);
+    if (verify) {
+      setExistRepo("Repositório já existe na lista!");
+      return;
+    }
+
+    setExistRepo("");
+  }
+
+  useMemo(() => handleVerify(), [newRepo]);
+
   async function handleAddRepository(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -48,13 +65,8 @@ const Dashboard: React.FC = () => {
       setInputError("Digite o autor/nome do repositório");
       return;
     }
-
-    const search = (item: any) => item.full_name === newRepo;
-    const verify = repositories.find(search);
-    if (verify) {
-      setExistRepo("Repositório já existe na lista!");
-      return;
-    }
+    //Repository already exists
+    if (existRepo) return;
 
     try {
       const { data, status } = await api.get<Repository>(`repos/${newRepo}`);
@@ -66,6 +78,7 @@ const Dashboard: React.FC = () => {
 
         setNewRepo("");
         setInputError("");
+        setExistRepo("");
       }
     } catch (error) {
       setInputError("Erro na busca por esse repositório");
