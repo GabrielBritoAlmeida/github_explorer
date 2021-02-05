@@ -1,5 +1,7 @@
 import React, { useState, useEffect, FormEvent } from "react";
 import { FiChevronRight } from "react-icons/fi";
+import { Link } from "react-router-dom";
+
 import api from "../../services/api";
 
 import logoImg from "../../assets/logo.svg";
@@ -17,6 +19,7 @@ interface Repository {
 const Dashboard: React.FC = () => {
   const [newRepo, setNewRepo] = useState("");
   const [inputError, setInputError] = useState("");
+  const [existRepo, setExistRepo] = useState("");
   const [repositories, setRepositories] = useState<Repository[]>(() => {
     const storageRepositories = localStorage.getItem(
       "@GithubExplorer:repositories"
@@ -43,6 +46,13 @@ const Dashboard: React.FC = () => {
 
     if (!newRepo) {
       setInputError("Digite o autor/nome do repositório");
+      return;
+    }
+
+    const search = (item: any) => item.full_name === newRepo;
+    const verify = repositories.find(search);
+    if (verify) {
+      setExistRepo("Repositório já existe na lista!");
       return;
     }
 
@@ -78,10 +88,14 @@ const Dashboard: React.FC = () => {
       </S.Form>
 
       {inputError && <S.Error>{inputError}</S.Error>}
+      {existRepo && <S.Error>{existRepo}</S.Error>}
 
       <S.Repositories>
         {repositories.map((repository) => (
-          <a key={repository.full_name} href="teste">
+          <Link
+            key={repository.full_name}
+            to={`/repository/${repository.full_name}`}
+          >
             <img
               src={repository.owner.avatar_url}
               alt={`link repository${repository.owner.login}`}
@@ -92,7 +106,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             <FiChevronRight size={20} />
-          </a>
+          </Link>
         ))}
       </S.Repositories>
     </>
