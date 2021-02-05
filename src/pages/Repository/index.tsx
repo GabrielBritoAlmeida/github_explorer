@@ -1,17 +1,28 @@
 import React from "react";
-import { useRouteMatch } from "react-router-dom";
+import { useRouteMatch, Link } from "react-router-dom";
+import { FiArrowLeft } from "react-icons/fi";
 
+import logoImg from "../../assets/logo.svg";
+
+import * as S from "./styles";
 interface RepositoryParams {
   repository: string;
 }
 
 const Repository: React.FC = () => {
   const { params } = useRouteMatch<RepositoryParams>();
+  console.log("🚀 ~ file:", params);
 
   return (
-    <div>
-      <h1>Repository: {params.repository}</h1>
-    </div>
+    <>
+      <S.Header>
+        <img src={logoImg} alt="Logo Github Explorer" />
+        <Link to="/dashboard">
+          <FiArrowLeft size={16} />
+          Voltar
+        </Link>
+      </S.Header>
+    </>
   );
 };
 

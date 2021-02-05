@@ -10,6 +10,7 @@ import * as S from "./styles";
 
 interface Repository {
   full_name: string;
+  description: string;
   owner: {
     login: string;
     avatar_url: string;
@@ -24,7 +25,6 @@ const Dashboard: React.FC = () => {
     item.full_name.toUpperCase() === newRepo.toUpperCase();
   const [newRepo, setNewRepo] = useState("");
   const [inputError, setInputError] = useState("");
-  const [existRepo, setExistRepo] = useState("");
   const [repositories, setRepositories] = useState<Repository[]>(() => {
     const storageRepositories = localStorage.getItem(
       "@GithubExplorer:repositories"
@@ -49,11 +49,11 @@ const Dashboard: React.FC = () => {
   function handleVerify(): void {
     const verify = repositories.find(search);
     if (verify) {
-      setExistRepo("Repositório já existe na lista!");
+      setInputError("Repositório já existe na lista!");
       return;
     }
 
-    setExistRepo("");
+    setInputError("");
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,7 +67,7 @@ const Dashboard: React.FC = () => {
       return;
     }
     //Repository already exists
-    if (existRepo) return;
+    if (inputError) return;
 
     try {
       const { data, status } = await api.get<Repository>(`repos/${newRepo}`);
@@ -79,7 +79,6 @@ const Dashboard: React.FC = () => {
 
         setNewRepo("");
         setInputError("");
-        setExistRepo("");
       }
     } catch (error) {
       setInputError("Erro na busca por esse repositório");
@@ -102,7 +101,6 @@ const Dashboard: React.FC = () => {
       </S.Form>
 
       {inputError && <S.Error>{inputError}</S.Error>}
-      {existRepo && <S.Error>{existRepo}</S.Error>}
 
       <S.Repositories>
         {repositories.map((repository) => (
@@ -116,7 +114,7 @@ const Dashboard: React.FC = () => {
             />
             <div>
               <strong>{repository.full_name}</strong>
-              {/* <p>{repository.description}</p> */}
+              <p>{repository.description}</p>
             </div>
 
             <FiChevronRight size={20} />
